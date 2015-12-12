@@ -8,34 +8,34 @@
 		if ( $cmd == "add" ) {
 			$id = $_GET["id"];
 			$day = $_GET["day"];
-			$query = "INSERT INTO hci VALUES('". $id ."', 0, 0)";
+			$query = "INSERT INTO hci (id, isChecked, day) VALUES('". $id ."', 0, 0)";
 		}
 		
 		else if ( $cmd == "delete" ) {
 			$id = $_GET["id"];
-			$query = "DELETE FROM hci WEHRE id='". $id ."'";
+			$query = "DELETE FROM hci WHERE id='". $id ."'";
 		}
 		
 		else if ( $cmd == "getList" ) {
-			$day = $_GET["day"];
-			$query = "SELECT * FROM hci WHERE day='". $day ."'";
-		}	
-		echo $query."<br />";
+			$query = "SELECT * FROM hci WHERE 1";
+		}
+		
 		$dbLink = mysqli_connect('localhost', 'root', 'pdlwp88qja', 'hci') or die('db die');
-		$queryResult = mysqli_query($dbLink, $query) or die("Error: ".mysqli_error($dbLink));
-		if( !isset($queryResult) ) {
-			die("Database query failed");
-		}
-		else {
-			$row = mysqli_fetch_row($queryResult);
-			echo implode($row);
-		}
-		/*
-		else {
-			
-			echo $queryResult;
-		}*/
-			
+		mysqli_set_charset($dbLink, 'utf8');
+		$queryResult = mysqli_query($dbLink, $query) or die("Error: ".mysqli_error($dbLink) . $query);
+		$arr = array();
+		if ( is_bool($queryResult) )
+			array_push(var_export($queryResult, true));
+		else
+			while($result = mysqli_fetch_array( $queryResult )) {
+				array_push( $arr, $result );
+			} 
+		$responseData = array(
+			'query' => $query,
+			'result' => $arr 
+			);
+		echo json_encode($responseData);
+		
 		mysqli_close($dbLink);
 	}
 	
