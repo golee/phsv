@@ -8,7 +8,7 @@
 		if ( $cmd == "add" ) {
 			$id = $_GET["id"];
 			$day = $_GET["day"];
-			$query = "INSERT INTO hci (id, isChecked, day) VALUES('". $id ."', 0, 0)";
+			$query = "INSERT INTO hci (id, isChecked, day) VALUES('". $id ."', 0, ".$day.")";
 		}
 		
 		else if ( $cmd == "delete" ) {
@@ -19,20 +19,32 @@
 		else if ( $cmd == "getList" ) {
 			$query = "SELECT * FROM hci WHERE 1";
 		}
+		else if ( $cmd == "fix" ) {
+			$id = $_GET["id"];
+			$query = "UPDATE hci SET isChecked=1 WHERE id='" . $id . "'";
+		}
+		else if ( $cmd == "modify" ) {
+			$id = $_GET["id"];
+			$newId = $_GET["newId"];
+			//$query = "UPDATE hci SET isChecked=1 WHERE id='" . $id . "'";
+
+		}
 		
 		$dbLink = mysqli_connect('localhost', 'root', 'pdlwp88qja', 'hci') or die('db die');
 		mysqli_set_charset($dbLink, 'utf8');
 		$queryResult = mysqli_query($dbLink, $query) or die("Error: ".mysqli_error($dbLink) . $query);
-		$arr = array();
-		if ( is_bool($queryResult) )
-			array_push(var_export($queryResult, true));
+		$arrayResult = array();
+		if ( is_bool($queryResult) )	// add, delete
+			array_push($arrayResult, var_export($queryResult, true));
 		else
-			while($result = mysqli_fetch_array( $queryResult )) {
-				array_push( $arr, $result );
-			} 
+			while( $result = mysqli_fetch_array($queryResult) ) {
+				array_push( $arrayResult, $result );
+			}
 		$responseData = array(
 			'query' => $query,
-			'result' => $arr 
+			'cmd' => $cmd,
+			'row' => mysqli_affected_rows($dbLink),
+			'result' => $arrayResult 
 			);
 		echo json_encode($responseData);
 		
