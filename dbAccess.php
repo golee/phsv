@@ -8,7 +8,8 @@
 		if ( $cmd == "add" ) {
 			$id = $_GET["id"];
 			$day = $_GET["day"];
-			$query = "INSERT INTO hci (id, isChecked, day) VALUES('". $id ."', 0, ".$day.")";
+			$icon = $_GET["icon"];
+			$query = "INSERT INTO hci (id, isChecked, day, icon) VALUES('". $id ."', 0, ".$day.",". $icon .")";
 		}
 		
 		else if ( $cmd == "delete" ) {
@@ -27,7 +28,17 @@
 			$id = $_GET["id"];
 			$newId = $_GET["newId"];
 			//$query = "UPDATE hci SET isChecked=1 WHERE id='" . $id . "'";
-
+		}
+		else if ( $cmd == "important" ) {
+			$id = $_GET["id"];
+			$isImportant = $_GET["isImportant"];
+			$id = $_GET["id"];
+			$impVal;
+			if ( $isImportant == "true" )
+				$impVal = 0;
+			else
+				$impVal = 1;
+			$query = "UPDATE hci SET isImportant=". $impVal ." WHERE id='" . $id . "'";
 		}
 		
 		$dbLink = mysqli_connect('localhost', 'root', 'pdlwp88qja', 'hci') or die('db die');
@@ -39,7 +50,7 @@
 		else
 			while( $result = mysqli_fetch_array($queryResult) ) {
 				array_push( $arrayResult, $result );
-			}
+			} 
 		$responseData = array(
 			'query' => $query,
 			'cmd' => $cmd,

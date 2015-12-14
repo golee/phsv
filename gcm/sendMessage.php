@@ -1,13 +1,40 @@
 <?
-	function sendMessage( $message ) {
+	$token = $_GET["token"];
+	if ( is_null($token) )
+		;
+	else
+		setToken($token);
+	
+	function setToken ( $token ) {
+		$query = "UPDATE gcmToken SET token='". $token ."' WHERE 1";
+		$dbLink = mysqli_connect('localhost', 'root', 'pdlwp88qja', 'hci') or die('db die');
+		mysqli_set_charset($dbLink, 'utf8');
+		$queryResult = mysqli_query($dbLink, $query) or die("Error: ".mysqli_error($dbLink) . $query);
+		echo "token inserted";
+	}
+	
+	function getToken () {
+		$query = "SELECT token FROM gcmToken WHERE 1";
+		$dbLink = mysqli_connect('localhost', 'root', 'pdlwp88qja', 'hci') or die('db die');
+		mysqli_set_charset($dbLink, 'utf8');
+		$queryResult = mysqli_query($dbLink, $query) or die("Error: ".mysqli_error($dbLink) . $query);
+		
+		$arrayResult = array();
+		while( $result = mysqli_fetch_array($queryResult) ) {
+			array_push( $arrayResult, $result );
+		}
+		$token = $arrayResult[0]["token"];
+		return $token;
+	}
+	function sendMessage( $message, $cmd="nothing" ) {
 		$serverKey = 'AIzaSyCtxTkAPKiSKGOGehDxt97Z8zI7EqrHp6A';
 		$url = 'https://gcm-http.googleapis.com/gcm/send';
 		$headers = array(
 				'Content-Type:application/json',
 				'Authorization:key='.$serverKey
 				);
-		$data = array('data' => array('title'=>"PackingHelper", "message" => $message),
-			'to' => 'el53otEAakg:APA91bFmS6qDdHWVz4nAkKMG9Cd_dOzZV1wSxu9zWPt2NhcQsr-93WvGPnVoML8wgLfOUfxRKsTPGVXbwjfgD6sE8Wh86tjDzJVk34AkzYVsb6Y3_tNQ3uJLawx8sFHyo3HDPHKeD6J9');
+		$data = array('data' => array('title'=>"PackingHelper", "message" => $message, "cmd" => $cmd),
+			'to' => getToken() );
 		$data = json_encode($data);
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);

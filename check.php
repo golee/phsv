@@ -25,8 +25,10 @@
 		if ( is_bool($queryResult) ) {
 			if ( mysqli_affected_rows($dbLink) === 0 )
 				echo $id. ": affected row:0";
-			else
-				echo $id." is Checked ". $queryResult; 
+			else {
+				echo $id." is Checked ". $queryResult;
+				sendMessage( $id , "update");
+			}
 		}
 		else {
 			if ( $cmd == "check" ) {
